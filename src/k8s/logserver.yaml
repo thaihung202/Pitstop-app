@@ -40,7 +40,7 @@ metadata:
   name: logserver
   namespace: pitstop
 spec:
-  type: NodePort
+  type: LoadBalancer
   ports:
   - name: "http-5341"
     port: 5341

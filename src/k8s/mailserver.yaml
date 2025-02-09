@@ -38,7 +38,7 @@ metadata:
   name: mailserver
   namespace: pitstop
 spec:
-  type: NodePort
+  type: LoadBalancer
   ports:
   - name: "smtp"
     port: 25

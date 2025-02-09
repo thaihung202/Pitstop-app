@@ -6,7 +6,7 @@ metadata:
   name: customermanagementapi
   namespace: pitstop
 spec:
-  type: NodePort
+  type: LoadBalancer
   ports:
   - name: "http-5100"
     port: 5100

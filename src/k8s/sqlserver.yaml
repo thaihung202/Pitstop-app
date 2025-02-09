@@ -42,7 +42,7 @@ metadata:
   name: sqlserver
   namespace: pitstop
 spec:
-  type: NodePort
+  type: LoadBalancer
   ports:
   - name: "tds"
     port: 1433
