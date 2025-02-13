@@ -26,13 +26,6 @@ pipeline{
                 }
             }
         }
-        //stage("Quality gate"){
-           //steps {
-               // script {
-                   // waitForQualityGate abortPipeline: false, credentialsId: 'Sonar-token' 
-                //}
-           // } 
-        //}
 
         stage('OWASP FS SCAN') {
             steps {
