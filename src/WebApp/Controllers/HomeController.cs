@@ -3,6 +3,7 @@
 public class HomeController : Controller
 {
     [HttpGet]
+    [HttpHead]
     public IActionResult Index()
     {
         return View();
