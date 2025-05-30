@@ -14,6 +14,7 @@
     }
 
     [HttpGet]
+    [HttpHead]
     public async Task<IActionResult> Index(DateTime? planningDate)
     {
         return await _resiliencyHelper.ExecuteResilient(async () =>
@@ -29,8 +30,8 @@
                 MaintenanceJobs = new List<MaintenanceJob>()
             };
 
-                // get planning
-                string dateStr = planningDate.Value.ToString("yyyy-MM-dd");
+            // get planning
+            string dateStr = planningDate.Value.ToString("yyyy-MM-dd");
             WorkshopPlanning planning = await _workshopManagementAPI.GetWorkshopPlanning(dateStr);
             if (planning?.Jobs?.Count > 0)
             {
@@ -42,6 +43,7 @@
     }
 
     [HttpGet]
+    [HttpHead]
     public async Task<IActionResult> Details(DateTime planningDate, string jobId)
     {
         return await _resiliencyHelper.ExecuteResilient(async () =>
@@ -57,6 +59,7 @@
     }
 
     [HttpGet]
+    [HttpHead]
     public async Task<IActionResult> New(DateTime planningDate)
     {
         return await _resiliencyHelper.ExecuteResilient(async () =>
@@ -76,6 +79,7 @@
     }
 
     [HttpGet]
+    [HttpHead]
     public async Task<IActionResult> Finish(DateTime planningDate, string jobId)
     {
         return await _resiliencyHelper.ExecuteResilient(async () =>

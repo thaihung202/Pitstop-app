@@ -13,6 +13,7 @@ public class RefDataController : Controller
     }
 
     [HttpGet]
+    [HttpHead]
     [Route("customers")]
     public async Task<IActionResult> GetCustomers()
     {
@@ -20,6 +21,7 @@ public class RefDataController : Controller
     }
 
     [HttpGet]
+    [HttpHead]
     [Route("customers/{customerId}")]
     public async Task<IActionResult> GetCustomerByCustomerId(string customerId)
     {
@@ -32,6 +34,7 @@ public class RefDataController : Controller
     }
 
     [HttpGet]
+    [HttpHead]
     [Route("vehicles")]
     public async Task<IActionResult> GetVehicles()
     {
@@ -39,6 +42,7 @@ public class RefDataController : Controller
     }
 
     [HttpGet]
+    [HttpHead]
     [Route("vehicles/{licenseNumber}")]
     public async Task<IActionResult> GetVehicleByLicenseNumber(string licenseNumber)
     {

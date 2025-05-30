@@ -18,6 +18,7 @@ public class WorkshopPlanningController : Controller
     }
 
     [HttpGet]
+    [HttpHead]
     [Route("{planningDate}", Name = "GetByDate")]
     public async Task<IActionResult> GetByDate(DateTime planningDate)
     {
@@ -40,6 +41,7 @@ public class WorkshopPlanningController : Controller
     }
 
     [HttpGet]
+    [HttpHead]
     [Route("{planningDate}/jobs/{jobId}")]
     public async Task<IActionResult> GetMaintenanceJobAsync(DateTime planningDate, Guid jobId)
     {

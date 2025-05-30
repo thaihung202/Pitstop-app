@@ -17,6 +17,7 @@
     }
 
     [HttpGet]
+    [HttpHead]
     public async Task<IActionResult> Index()
     {
         return await _resiliencyHelper.ExecuteResilient(async () =>
@@ -30,6 +31,7 @@
     }
 
     [HttpGet]
+    [HttpHead]
     public async Task<IActionResult> Details(string licenseNumber)
     {
         return await _resiliencyHelper.ExecuteResilient(async () =>
@@ -47,12 +49,13 @@
     }
 
     [HttpGet]
+    [HttpHead]
     public async Task<IActionResult> New()
     {
         return await _resiliencyHelper.ExecuteResilient(async () =>
         {
-                // get customerlist
-                var customers = await _customerManagementAPI.GetCustomers();
+            // get customerlist
+            var customers = await _customerManagementAPI.GetCustomers();
 
             var model = new VehicleManagementNewViewModel
             {
@@ -82,6 +85,7 @@
     }
 
     [HttpGet]
+    [HttpHead]
     public IActionResult Error()
     {
         return View();

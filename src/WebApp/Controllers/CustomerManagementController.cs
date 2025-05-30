@@ -14,6 +14,7 @@ public class CustomerManagementController : Controller
     }
 
     [HttpGet]
+    [HttpHead]
     public async Task<IActionResult> Index()
     {
         return await _resiliencyHelper.ExecuteResilient(async () =>
@@ -27,6 +28,7 @@ public class CustomerManagementController : Controller
     }
 
     [HttpGet]
+    [HttpHead]
     public async Task<IActionResult> Details(string id)
     {
         return await _resiliencyHelper.ExecuteResilient(async () =>
@@ -40,6 +42,7 @@ public class CustomerManagementController : Controller
     }
 
     [HttpGet]
+    [HttpHead]
     public IActionResult New()
     {
         var model = new CustomerManagementNewViewModel

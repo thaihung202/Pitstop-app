@@ -14,12 +14,14 @@ public class VehiclesController : Controller
     }
 
     [HttpGet]
+    [HttpHead]
     public async Task<IActionResult> GetAllAsync()
     {
         return Ok(await _dbContext.Vehicles.ToListAsync());
     }
 
     [HttpGet]
+    [HttpHead]
     [Route("{licenseNumber}", Name = "GetByLicenseNumber")]
     public async Task<IActionResult> GetByLicenseNumber(string licenseNumber)
     {

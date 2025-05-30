@@ -13,12 +13,14 @@ public class CustomersController : Controller
     }
 
     [HttpGet]
+    [HttpHead]
     public async Task<IActionResult> GetAllAsync()
     {
         return Ok(await _dbContext.Customers.ToListAsync());
     }
 
     [HttpGet]
+    [HttpHead]
     [Route("{customerId}", Name = "GetByCustomerId")]
     public async Task<IActionResult> GetByCustomerId(string customerId)
     {
