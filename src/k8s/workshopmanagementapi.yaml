@@ -39,7 +39,7 @@ metadata:
   name: workshopmanagementapi
   namespace: pitstop
 spec:
-  type: NodePort
+  type: LoadBalancer
   ports:
   - name: "http-5200"
     port: 5200
