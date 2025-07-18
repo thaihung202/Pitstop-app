@@ -9,23 +9,38 @@ Application Architecture
 ## Introduction
 The Pitstop application is a service management system implemented using a microservices architecture. Jenkins CI/CD pipeline is utilized to automate the development and deployment processes. The application includes tools such as Trivy and SonarQube for code scanning, Docker for building images, Terraform for creating an AWS EKS cluster, and Prometheus and Grafana for monitoring the application.
 
+This project also focuses on optimizing performance using Content Delivery Networks (CDNs) integrated into a multi-cloud environment (AWS and Azure). It evaluates both open-source (cdnjs) and commercial solutions (CloudFront).
+
 ## Technologies Used
 - **Jenkins**: CI/CD pipeline
 - **Trivy**: Code and Docker image scanning
 - **SonarQube**: Code quality analysis
 - **Docker**: Building and managing Docker images
 - **Terraform**: Infrastructure management
-- **AWS EKS**: Deploying applications on Kubernetes
+- **AWS EKS**: Kubernetes managed cluster on AWS
+- **Azure AKS**: Kubernetes managed cluster on Azure
+- **AWS CloudFront**: CDN for static content and APIs
+- **cdnjs**: Open-source CDN for frontend libraries
 - **Prometheus**: Application monitoring
 - **Grafana**: Data visualization for monitoring
 - **Email Notifications**: Sending notifications via email
 
+ ## **System deployment model**
+
+<div align="center">
+  <img src="./png/multi-cloud.png" alt="Logo" width="100%" height="100%">
+  </a>
+</div>
+
+ **Pipeline**
 
 <div align="center">
   <img src="./png/workflow.png" alt="Logo" width="100%" height="100%">
   </a>
 </div>
 <br />
+
+## **Web app**
 
 <div align="center">
   <img src="./png/app.png" alt="Logo" width="100%" height="100%">
@@ -44,7 +59,7 @@ The Pitstop application is a service management system implemented using a micro
 </div>
 
 
-### **CI/CD Pipeline in Jenkins**
+## **CI/CD Pipeline in Jenkins**
 
 **Pipeline Stage View:**
 
@@ -96,7 +111,7 @@ pipeline{
                     -Dsonar.projectKey=Pitstop '''
                 }
             }
-        }
+        } 
         //stage("Quality gate"){
            //steps {
                // script {
@@ -107,15 +122,15 @@ pipeline{
 
         stage('OWASP FS SCAN') {
             steps {
-                dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'DP-Check'
+                dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'DP-Check' 
                 dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-            }
-        }
+           }
+        } 
         stage('TRIVY FS SCAN') {
             steps {
                 sh "trivy fs . > trivyfs.txt"
             }
-        }
+        } 
         stage("Docker Build base image"){
             steps{
                 sh """
@@ -188,7 +203,7 @@ pipeline{
         }
         stage('Deploy to EKS_Cluster') {
             steps {
-                withKubeConfig(caCertificate: '', clusterName: 'Pitstop-cluster', contextName: '', credentialsId: 'k8s-cred', namespace: 'pitstop', restrictKubeConfigAccess: false, serverUrl: 'https://3F6DEB8E29B8B2ABE46DFB241488A1E7.gr7.ap-southeast-1.eks.amazonaws.com') {
+                withKubeConfig(caCertificate: '', clusterName: 'Pitstop-cluster', contextName: '', credentialsId: 'k8-cred', namespace: 'pitstop', restrictKubeConfigAccess: false, serverUrl: 'https://EBF0BC069A6A97BC2D71FA6A6DE3D0B2.gr7.ap-southeast-1.eks.amazonaws.com') {
                     sh """
                     kubectl apply \
                         -f src/k8s/pitstop-namespace.yaml \
@@ -211,10 +226,43 @@ pipeline{
                 }
             }
         }
-        stage('Verify the Deployment') {
+        stage('Verify the EKS Deployment') {
             steps {
-                withKubeConfig(caCertificate: '', clusterName: 'Pitstop-cluster', contextName: '', credentialsId: 'k8s-cred', namespace: 'pitstop', restrictKubeConfigAccess: false, serverUrl: 'https://3F6DEB8E29B8B2ABE46DFB241488A1E7.gr7.ap-southeast-1.eks.amazonaws.com') {
-                    sh "kubectl get nodes" 
+                withKubeConfig(caCertificate: '', clusterName: 'Pitstop-cluster', contextName: '', credentialsId: 'k8-cred', namespace: 'pitstop', restrictKubeConfigAccess: false, serverUrl: 'https://EBF0BC069A6A97BC2D71FA6A6DE3D0B2.gr7.ap-southeast-1.eks.amazonaws.com') {
+                    sh "kubectl get pods"
+                    sh "kubectl get svc" 
+                }
+            }
+        }
+    
+        stage('Deploy to AKS_Cluster') {
+            steps {
+                 withKubeConfig(credentialsId: 'aks-kubeconfig2', namespace: 'pitstop') {
+                    sh """
+                    kubectl apply --validate=false \
+                        -f src/k8s/pitstop-namespace.yaml \
+                        -f src/k8s/rabbitmq.yaml \
+                        -f src/k8s/logserver.yaml \
+                        -f src/k8s/sqlserver.yaml \
+                        -f src/k8s/mailserver.yaml \
+                        -f src/k8s/invoiceservice.yaml \
+                        -f src/k8s/timeservice.yaml \
+                        -f src/k8s/notificationservice.yaml \
+                        -f src/k8s/workshopmanagementeventhandler.yaml \
+                        -f src/k8s/auditlogservice.yaml \
+                        -f src/k8s/customermanagementapi-v1.yaml \
+                        -f src/k8s/customermanagementapi-svc.yaml \
+                        -f src/k8s/vehiclemanagementapi.yaml \
+                        -f src/k8s/workshopmanagementapi.yaml \
+                        -f src/k8s/webapp.yaml
+                    """
+                    sleep 60 
+                }
+            }
+        }
+        stage('Verify the AKS Deployment') {
+            steps {
+                 withKubeConfig(credentialsId: 'aks-kubeconfig2', namespace: 'pitstop') {
                     sh "kubectl get pods"
                     sh "kubectl get svc" 
                 }
@@ -271,7 +319,7 @@ pipeline{
   <img src="./png/sonarqube.png" alt="Logo" width="100%" height="100%">
 </div>
 
-### **Create EKS Cluster with Terraform**
+## **Create EKS Cluster with Terraform**
 
 <div align="center">
   <img src="./png/eks-cluster.png" alt="Logo" width="100%" height="100%">
@@ -281,6 +329,31 @@ pipeline{
   <img src="./png/eks-nodegroup.png" alt="Logo" width="100%" height="100%">
 </div>
 
+## **AKS Cluster**
+
+<div align="center">
+  <img src="./png/aks-cluster.png" alt="Logo" width="100%" height="100%">
+</div>
+
+## **Cloudfront distribution**
+
+<div align="center">
+  <img src="./png/distribution.png" alt="Logo" width="100%" height="100%">
+</div>
+
+## **Performance testing before and after CDN integration**
+
+**Load time of resources when accessing frontend (New York)**
+
+<div align="center">
+  <img src="./png/table1-ny.png" alt="Logo" width="100%" height="100%">
+</div>
+
+**Load time of resources when accessing frontend (Brazil)**
+
+<div align="center">
+  <img src="./png/table2-bra.png" alt="Logo" width="100%" height="100%">
+</div>
 
 ### **Monitoring with prometheus and grafana**
 
@@ -296,11 +369,11 @@ Grafana
   <img src="./png/grafana.png" alt="Logo" width="100%" height="100%">
 </div>
 
-Blackbox Exporter
-
 <div align="center">
-  <img src="./png/blackbox.png" alt="Logo" width="100%" height="100%">
+  <img src="./png/grafana2.png" alt="Logo" width="100%" height="100%">
 </div>
+
+
 
 ### **Send Notification to email**
 
